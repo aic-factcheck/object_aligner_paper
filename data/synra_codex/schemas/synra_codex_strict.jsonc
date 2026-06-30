@@ -1,0 +1,65 @@
+{
+  "type": "object",
+  "properties": {
+    "people": {
+      "type": "array",
+      "order": "align",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id":    {"type": "string"},
+          "name":  {"type": "string", "score": "jaro_winkler"},
+          "title": {"type": "string", "score": "exact", "valueWeight": 1.5}
+        }
+      }
+    },
+    "companies": {
+      "type": "array",
+      "order": "align",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id":       {"type": "string"},
+          "name":     {"type": "string", "score": "jaro_winkler"},
+          "industry": {"type": "string", "score": "exact", "valueWeight": 1.5}
+        }
+      }
+    },
+    "employment": {
+      "type": "array",
+      "order": "align",
+      "items": {
+        "type": "object",
+        "properties": {
+          "person":  {"type": "string"},
+          "company": {"type": "string"},
+          "role":    {"type": "string", "score": "exact"}
+        }
+      }
+    },
+    "acquaintance": {
+      "type": "array",
+      "order": "align",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source":   {"type": "string"},
+          "target":   {"type": "string"},
+          "relation": {"type": "string", "score": "exact"}
+        }
+      }
+    },
+    "partnership": {
+      "type": "array",
+      "order": "align",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source":   {"type": "string"},
+          "target":   {"type": "string"},
+          "relation": {"type": "string", "score": "exact"}
+        }
+      }
+    }
+  }
+}

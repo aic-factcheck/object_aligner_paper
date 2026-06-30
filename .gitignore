@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# uv / venv
+.venv/
+.python-version
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Environment variables (API keys etc.)
+.env
+
+# OS
+.DS_Store
+
+# Editors
+.idea/
+.vscode/
+
+research/
+
+# ---------------------------------------------------------------------------
+# Datasets & run artifacts — ALLOWLIST.
+#
+# Ignore EVERYTHING under data/ (the actual dataset corpora, downloaded raw
+# data, preprocessed JSONL, train/val/test splits, per-run GEPA logs under
+# data/runs/, etc.) and re-include ONLY the hand-authored INPUTS (OA schemas,
+# seed prompts, dataset READMEs) and the small shipped AGGREGATES
+# (data/results/ and the no-LLM intrinsic v2 dirs). Anything not explicitly
+# re-included below stays ignored — so regenerated/downloaded data and runs are
+# never committed by accident. Re-create them with scripts/prepare_*.py and the
+# GEPA runners.
+# ---------------------------------------------------------------------------
+data/**
+# Re-include directories so git can descend to the allowed files below.
+!data/**/
+# Hand-authored inputs.
+!data/**/schemas/**
+!data/**/seed_prompt.txt
+!data/*/README.md
+# Small shipped aggregates (reproduce the paper's floats without a GPU re-run).
+!data/results/**
+!data/synra_codex/intrinsic/v2/**
+!data/synra_sort/intrinsic/v2/**

@@ -1,0 +1,33 @@
+# LM configuration for the GEPA_REBEL experiment.
+#
+# Edit this file to swap models or endpoints. Both LMs are spoken to via
+# OpenAI-compatible chat-completions APIs. Set `api_key_env` to the NAME of
+# the environment variable that holds your key, or null/~ for endpoints (like
+# a local llama_cpp server) that don't need auth.
+#
+# Override any field on the command line via env vars:
+#   OAEXP_TASK_LM_MODEL=gpt-4o-mini uv run python scripts/run_gepa_rebel.py --arm oa_feedback
+#   OAEXP_REFLECTION_LM_BASE_URL=https://api.openai.com/v1 uv run ...
+#   OAEXP_TASK_LM_API_KEY_ENV=OPENAI_API_KEY uv run ...
+# (Env vars take precedence over YAML.)
+#
+# Use a different YAML file with:
+#   OAEXP_CONFIG=config/experiment.openai.yaml uv run ...
+
+# task_lm:
+  # Called many times per GEPA iteration to emit a JSON graph.
+  # model:       Huihui-Qwen3-VL-8B-Instruct-abliterated
+  # base_url:    http://localhost:8333/v1
+  # api_key_env: ~                  # local llama_cpp; no auth
+
+task_lm: # RCI ollama; no auth
+  model:       PLACEHOLDER_SET_VIA__OAEXP_TASK_LM_MODEL
+  base_url:    http://localhost:8222/v1
+  api_key_env: ~
+  max_tokens: 8192
+
+reflection_lm:
+  # Called once per GEPA proposer step to rewrite the candidate prompt.
+  model:       gpt-5
+  base_url:    https://api.openai.com/v1
+  api_key_env: OPENAI_API_KEY

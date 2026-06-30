@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+__STYLE_CSS__
+</style>
+</head>
+<body>
+<header id="topbar">
+  <div class="topbar-row">
+    <h1 id="run-label">__RUN_LABEL__</h1>
+    <span class="arm" id="arm-badge">__ARM__</span>
+    __WL_BADGE__
+    <span class="chip" id="task-lm-chip" title="task_lm model"></span>
+    <span class="chip chip-dim" id="reflection-lm-chip" title="reflection_lm model"></span>
+    <span class="spacer"></span>
+    <span class="holdout" id="holdout-chip"></span>
+  </div>
+  <details id="config-details" class="config-details">
+    <summary>Config</summary>
+    <pre id="config-text"></pre>
+  </details>
+</header>
+
+<div id="layout">
+  <aside id="sidebar">
+    <div class="sidebar-title">
+      Candidates
+      <span class="hint" id="cand-subtitle"></span>
+    </div>
+    <table id="cand-table">
+      <thead><tr id="cand-head"></tr></thead>
+      <tbody id="cand-body"></tbody>
+    </table>
+  </aside>
+
+  <main id="main">
+    <div class="navbar">
+      <button id="sidebar-toggle" class="navbtn" title="Show/hide candidate panel">☰</button>
+      <button id="sample-prev" class="navbtn" title="Previous sample (←)">◀</button>
+      <span id="sample-pos" class="sample-pos"></span>
+      <button id="sample-next" class="navbtn" title="Next sample (→)">▶</button>
+      <label class="sample-label">Sample <select id="sample-select"></select></label>
+      <span class="spacer"></span>
+      <button id="wrap-toggle" class="navbtn" title="Wrap long lines in the GOLD/PRED panes (w)">↵ Wrap</button>
+      <div class="mode-toggle" role="group" aria-label="mode">
+        <button id="mode-raw" type="button">Raw</button>
+        <button id="mode-aligned" type="button">Aligned</button>
+        <button id="mode-goldids" type="button" title="Aligned, with predicted IDs/refs rewritten to gold's ID namespace">Gold-IDs</button>
+      </div>
+      <span class="keys-hint" title="Keyboard shortcuts">⌨ ←/→ samples · ↑/↓ candidates · r/a/g mode · w wrap</span>
+    </div>
+
+    <div class="scoreline">
+      <span id="score-block" class="score-block"></span>
+      <span class="pareto-badge" id="pareto-badge" style="display:none">★ Pareto @ iter <span id="pareto-iter"></span></span>
+    </div>
+
+    <div class="banner" id="banner" style="display:none"></div>
+
+    <details class="system-prompt" id="sys-prompt-details">
+      <summary id="sys-prompt-summary">System prompt</summary>
+      <pre id="sys-prompt-text"></pre>
+    </details>
+
+    <div class="context">
+      <div class="title" id="ctx-title"></div>
+      <div class="body" id="ctx-body"></div>
+    </div>
+
+    <details class="feedback" id="feedback-block" style="display:none">
+      <summary>OA feedback</summary>
+      <pre id="feedback-text"></pre>
+    </details>
+
+    <div class="panes wrap" id="panes">
+      <div class="pane">
+        <div class="pane-header">GOLD</div>
+        <div class="pane-body" id="gold-pane"></div>
+      </div>
+      <div class="pane">
+        <div class="pane-header">PRED</div>
+        <div class="pane-body" id="pred-pane"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const DATA = __DATA_JSON__;
+</script>
+<script>
+__APP_JS__
+</script>
+</body>
+</html>

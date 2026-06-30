@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "properties": {
+    "entities": {
+      "type": "array",
+      "order": "align",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id":   {"type": "string"},
+          "type": {"type": "string", "score": "exact"},
+          "mentions": {
+            "type": "array",
+            "order": "align",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {"type": "string", "score": "exact"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "relations": {
+      "type": "array",
+      "order": "align",
+      "items": {
+        "type": "object",
+        "properties": {
+          "subject":   {"type": "string"},
+          "predicate": {"type": "string", "score": "exact"},
+          "object":    {"type": "string"}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "indices": {
+      "type": "array",
+      "order": "fixed",
+      "items": {"type": "integer", "score": "exact"}
+    }
+  }
+}

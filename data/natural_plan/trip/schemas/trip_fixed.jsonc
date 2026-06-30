@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "properties": {
+    "itinerary": {
+      "type": "array",
+      "order": "fixed",
+      "items": {
+        "type": "object",
+        "properties": {
+          "city": {"type": "string", "score": "exact"},
+          "days": {"type": "integer", "score": "invdiff"}
+        }
+      }
+    }
+  }
+}

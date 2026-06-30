@@ -1,0 +1,12 @@
+You extract a scientific knowledge graph from an AI-paper abstract.
+
+Output a SINGLE JSON object with exactly these two top-level keys:
+  "entities":  a list of {"id": <string>, "type": <string>, "mentions": [{"text": <string>}, ...]} objects.
+  "relations": a list of {"subject": <entity-id>, "predicate": <string>, "object": <entity-id>} objects.
+
+Use short, stable ids of your own choosing (e.g. "e0", "e1"); the exact id
+strings do not matter as long as each entity has one consistent id and every
+relation's "subject" / "object" references ids defined in "entities". Each
+entity carries all of its surface mentions in its "mentions" list.
+
+Emit JSON only — no commentary, no markdown fences.

@@ -1,0 +1,61 @@
+[project]
+name = "object-aligner-paper"
+version = "0.1.0"
+description = "Reference implementation of the Object Aligner (OA) paper experiments: intrinsic graph-metric validation and extrinsic GEPA prompt-optimization."
+requires-python = ">=3.13"
+dependencies = [
+    "object-aligner",
+    "openai>=1.40",
+    "datasets>=2.20",
+    "python-dotenv>=1.0",
+    "tqdm>=4.66",
+    "json5>=0.9",
+    "pyyaml>=6.0",
+    # tenacity is a lazy soft-dep of LiteLLM: when num_retries > 0 (the default
+    # in gepa.lm.LM), LiteLLM imports tenacity inside completion_with_retries().
+    # Without it a single HTTP 500 from the reflection-LM gateway causes GEPA
+    # to silently drop that proposer iteration.
+    "tenacity>=8.2",
+    # nltk: robust sentence segmentation for the sentence_ordering arXiv corpus
+    # (lazy-imported; the ROCStories corpus uses a regex and needs no nltk).
+    "nltk>=3.8",
+    # jinja2: templating engine for the deterministic results report
+    # (scripts/build_results_report.py; templates under report/templates/results).
+    "jinja2>=3.1",
+    # penman: parse/encode AMR PENMAN notation (the Little Prince / Bio AMR
+    # corpora and the JSON<->graph conversion in datasets/amr.py).
+    "penman>=1.3",
+    # smatch: canonical AMR evaluation metric (amr_eval.py native leaderboard
+    # Smatch F1; the variable-alignment graph match RA reproduces).
+    "smatch>=1.0.4",
+    # rdkit: pulled in transitively by datasets/molecules.py, which the shared
+    # results aggregator (report/results.py) and holdout_eval import. The paper
+    # does not run the molecules dataset, but the module stays for import
+    # integrity, so rdkit remains a dependency.
+    "rdkit>=2023.9",
+    # aic-nlp-utils: AIC FactCheck NLP helpers (read_jsonl/json, batching, etc.).
+    "aic-nlp-utils",
+    # itables: interactive DataFrame tables in notebooks.
+    "itables>=2.0",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel",
+]
+
+# Object Aligner is pulled from its public GitHub repo. GEPA is NOT a uv-managed
+# source dependency — install it into the venv from GitHub at the pinned commit
+# (the current PyPI release lacks the `gepa.lm` module the runners need):
+#   uv pip install 'gepa[full] @ git+https://github.com/gepa-ai/gepa@df291bd8a3b99c70d2ff067ee2e89e0cdb81406a'
+# (see README.md, "Install").
+[tool.uv.sources]
+object-aligner = { git = "https://github.com/aic-factcheck/object_aligner" }
+aic-nlp-utils = { git = "https://github.com/aic-factcheck/aic-nlp-utils" }
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/object_aligner_exp"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

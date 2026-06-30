@@ -1,0 +1,104 @@
+### {{ ds.title }}
+
+{% if ds.blurb %}
+{{ ds.blurb }}
+
+{% endif %}
+_Run id: `gepa_{{ ds.id }}` · arms: {{ ds.arms | join(', ') }} · ablations: {{ ds.ablations | join(', ') }} · models: {{ ds.models_label }}._
+
+#### Sourcing & splits
+
+{% if ds.manifest is none %}
+_Split manifest unavailable for this dataset (no `manifest.json` on disk); split sizes are implicit in each run's `holdout.path`._
+{% else %}
+{% set m = ds.manifest %}
+{% if m.dataset %}
+- **Dataset:** {{ m.dataset }}
+{% endif %}
+{% if m.source %}
+- **Source:** {{ m.source }}
+{% endif %}
+{% if m.task %}
+- **Task id:** `{{ m.task }}`
+{% endif %}
+{% if m.difficulty_key %}
+- **Difficulty key:** `{{ m.difficulty_key }}`
+{% endif %}
+- **Carve seed:** `{{ m.seed if m.seed not in (none, '—') else '— (native source splits)' }}`
+- **Manifest:** `{{ m.path }}`
+{% if m.note %}
+- **Note:** {{ m.note }}
+{% endif %}
+
+{% set has_source = m.splits | selectattr('source_split') | list | length > 0 %}
+{% if m.splits %}
+{% if has_source %}
+| split | n | source split |
+|---|---|---|
+{% for s in m.splits %}
+| {{ s.name }} | {{ s.n }} | {{ s.source_split or '—' }} |
+{% endfor %}
+{% else %}
+| split | n |
+|---|---|
+{% for s in m.splits %}
+| {{ s.name }} | {{ s.n }} |
+{% endfor %}
+{% endif %}
+
+_↳ `{{ tables_file }}` → `tables["{{ ds.splits_key }}"]`_
+{% endif %}
+{% endif %}
+
+#### OA graded score — per model
+
+Object-Aligner graded score on its native scale **[0, 1]** (1 = perfect); zero-excluded mean ± sample std over seeds (n). One table per model; rows are the ablation (the schema GEPA optimised on). Columns are grouped by reflection arm — **(f)** = OA-feedback, **(s)** = OA-score — and within each arm every schema *kind* is shown. `★` marks the kind that was the optimisation criterion for that row.
+
+{% for mb in ds.models %}
+{% if mb.oa_rows %}
+**{{ mb.model }}**
+
+| ablation | n |{% for c in mb.oa_rows[0].f %} {{ c.kind }} (f) |{% endfor %}{% for c in mb.oa_rows[0].s %} {{ c.kind }} (s) |{% endfor %}{{ '' }}
+|---|---|{% for c in mb.oa_rows[0].f %}---|{% endfor %}{% for c in mb.oa_rows[0].s %}---|{% endfor %}{{ '' }}
+{% for r in mb.oa_rows %}
+| {{ r.ablation }} | {{ r.seeds }} |{% for c in r.f %} {% if c.primary %}★ {% endif %}{{ c.stat | fmt }} |{% endfor %}{% for c in r.s %} {% if c.primary %}★ {% endif %}{{ c.stat | fmt }} |{% endfor %}{{ '' }}
+{% endfor %}
+
+_↳ aggregate: `{{ tables_file }}` → `tables["{{ mb.oa_key }}"]` · per-seed (boxplots): `seeds.oa` where `dataset=={{ ds.id }}` & `model=={{ mb.model_id }}`_
+
+{% endif %}
+{% endfor %}
+{% if ds.native %}
+#### Native leaderboard metrics — per model
+
+Task-native leaderboard metric recomputed from the model responses (schema-independent; see §1 for definitions and scales). One table per model; rows are the ablation. For each metric: **(f)** = OA-feedback, **(s)** = OA-score. Mean ± sample std over seeds (n).
+
+{% for mb in ds.models %}
+{% if mb.native_rows %}
+**{{ mb.model }}**
+
+| ablation | n |{% for m in ds.native.metrics %} {{ m.name }} (f) | {{ m.name }} (s) |{% endfor %}{{ '' }}
+|---|---|{% for m in ds.native.metrics %}---|---|{% endfor %}{{ '' }}
+{% for r in mb.native_rows %}
+| {{ r.ablation }} | {{ r.seeds }} |{% for c in r.cols %} {{ c.fb | fmt(c.signed) }} | {{ c.sc | fmt(c.signed) }} |{% endfor %}{{ '' }}
+{% endfor %}
+
+_↳ aggregate: `{{ tables_file }}` → `tables["{{ mb.native_key }}"]` · per-seed (boxplots): `seeds.native` where `dataset=={{ ds.id }}` & `model=={{ mb.model_id }}`_
+
+{% endif %}
+{% endfor %}
+{% endif %}
+{% if show_failed %}
+#### Failed-sample accounting
+
+Per (model, ablation, arm): OA failures (`n_zero`, JSON/schema errors scoring 0, *excluded* from the OA means above) and native parse failures, as count and proportion of all seed-samples.
+
+| model | ablation | arm |{% for k in ds.kinds %} {{ k }} n_zero |{% endfor %}{% if ds.native %} native parse fails |{% endif %}{{ '' }}
+|---|---|---|{% for k in ds.kinds %}---|{% endfor %}{% if ds.native %}---|{% endif %}{{ '' }}
+{% for r in ds.failed_rows %}
+| {{ r.model }} | {{ r.ablation }} | {{ r.arm }} |{% for z in r.nz %} {{ z.pair | frac }} |{% endfor %}{% if ds.native %} {{ r.pf | frac }} |{% endif %}{{ '' }}
+{% endfor %}
+
+_↳ `{{ tables_file }}` → `tables["{{ ds.failed_key }}"]`_
+{% endif %}
+

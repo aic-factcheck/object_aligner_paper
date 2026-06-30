@@ -1,0 +1,211 @@
+# Descriptive prose for the deterministic results report. The ONLY hand-written
+# text in the generated document — kept here (not in code or templates) so it is
+# easy to review/edit. Loaded by report/results.py. All numbers in the report
+# are computed; nothing here is a metric value.
+
+# OA graded-score definition (rendered in §1). LaTeX math allowed.
+oa_score_def: >-
+  **OA graded score** — Object-Aligner's deterministic, schema-driven graded
+  list-alignment score in $[0,1]$ (the GEPA reward). A response that fails to
+  decode to valid JSON or violates the schema scores exactly $0$ and is counted
+  as a *failed sample* (`n_zero`). All scores are on their native scale
+  **$[0,1]$** (1 = perfect; never percentages). Means are reported per schema
+  *kind* as the zero-excluded mean (`mean_score_nonzero`); per-cell
+  failed-sample counts and the all-samples mean are omitted by default (enable
+  with `--failed-samples` / `--appendix`). Each run is scored under **every**
+  schema kind of its dataset
+  (so the per-dataset table is also a cross-schema view), with `★` marking the
+  kind the run was optimised on (`primary_kind`). NB some schema kinds are
+  intentionally lenient — e.g. the sentence-ordering *Hungarian* schema is
+  order-insensitive and scores ~1.0 for any permutation — so compare *across the
+  same kind* (column), not across an ablation's own primary kind.
+
+# Per-dataset display: title + one-line task description.
+dataset_display:
+  natural_plan_meeting:
+    title: NATURAL PLAN — Meeting Planning
+    blurb: >-
+      Schedule a day of meetings around a city subject to per-person
+      location/availability windows and pairwise travel times.
+  natural_plan_trip:
+    title: NATURAL PLAN — Trip Planning
+    blurb: >-
+      Order a multi-city itinerary so each city is visited for its required
+      number of days under flight-connectivity constraints.
+  planbench_blocksworld:
+    title: PlanBench — Blocksworld
+    blurb: >-
+      Generate an action plan that transforms the initial block configuration
+      into the goal configuration.
+  scierc_native_exact:
+    title: SciERC
+    blurb: >-
+      Extract a coreference-merged scientific knowledge graph (typed entities +
+      typed relations) from an abstract.
+  amr_littleprince:
+    title: AMR — Little Prince
+    blurb: >-
+      Parse an English sentence into its Abstract Meaning Representation graph
+      (concept nodes + role edges, with reentrancy). Variable names are
+      arbitrary, so referential alignment (amr_ra) reproduces the standard
+      Smatch metric and the ra-vs-strict gap is pure id-routing.
+  amr_bio:
+    title: AMR — Bio (USC/ISI)
+    blurb: >-
+      Parse a biomedical English sentence (cancer-research text) into its
+      Abstract Meaning Representation graph (concept nodes + role edges, with
+      reentrancy). Same wire shape and schema pair as Little Prince: variable
+      names are arbitrary, so referential alignment (amr_ra) reproduces the
+      standard Smatch metric and the ra-vs-strict gap is pure id-routing.
+  sentence_ordering_arxiv:
+    title: Sentence Ordering — arXiv abstracts
+    blurb: >-
+      Recover the original reading order of shuffled sentences from arXiv
+      abstracts (6–12 sentences).
+  sentence_ordering_rocstories:
+    title: Sentence Ordering — ROCStories
+    blurb: >-
+      Recover the original reading order of the five shuffled sentences of a
+      ROCStories narrative.
+  synra_nl_hard:
+    title: SynRA-NL (hard)
+    blurb: >-
+      Synthetic natural-language → relational-graph extraction
+      (people/companies/employment), hard split.
+  synra_nl_pilot:
+    title: SynRA-NL (pilot)
+    blurb: Synthetic natural-language → relational-graph extraction, pilot split.
+  synra_codex_noobf:
+    title: SynRA-Codex (no obfuscation)
+    blurb: >-
+      Synthetic code → relational-graph extraction, identifiers left readable.
+  synra_codex_noobf6:
+    title: SynRA-Codex (no obfuscation, depth 6)
+    blurb: >-
+      Synthetic code → relational-graph extraction, readable identifiers,
+      deeper variant.
+  synra_codex_obf:
+    title: SynRA-Codex (obfuscated)
+    blurb: Synthetic code → relational-graph extraction, identifiers obfuscated.
+  synra_codex_obf6:
+    title: SynRA-Codex (obfuscated, depth 6)
+    blurb: >-
+      Synthetic code → relational-graph extraction, obfuscated identifiers,
+      deeper variant.
+  graphimg_v2:
+    title: GraphImg v2
+    blurb: >-
+      Image → relational-graph extraction from rendered graph images (v2
+      generator).
+  graphimg_v3:
+    title: GraphImg v3
+    blurb: >-
+      Image → relational-graph extraction from rendered graph images (v3
+      generator, medium difficulty).
+  wec_eng:
+    title: WEC-Eng
+    blurb: >-
+      Cross-document event coreference: group tagged event mentions that refer
+      to the same real-world event. Mapped onto OA as a membership multigraph
+      (mentions = idScope aligned by an echoed marker; each event lists its
+      members as refs). Gold cluster/mention ids are opaque, non-derivable
+      integers, so the literal-id strict baseline is near-degenerate while RA
+      routes the partition.
+
+# task_lm directory id -> pretty model name.
+model_display:
+  gemma4-26b: Gemma-4-26B-A4B-it
+  gemma4-e4b: Gemma-4-E4B-it
+  qwen35-35b: Qwen3.5-35B-A3B
+  qwen35-9b: Qwen3.5-9B-A3B
+  qwen3vl-8b: Qwen3-VL-8B-Instruct
+
+# Native leaderboard-metric definitions, keyed by dataset then metric. Wording
+# lifted from each evaluator's docstring/CAVEATS so it matches the code.
+native_metric_defs:
+  planbench_blocksworld:
+    solve_rate: >-
+      **Solve rate** — plan *validity* (PlanBench's official metric, not
+      exact-match): an action sequence scores 1 iff, executed from the initial
+      state under standard IPC Blocksworld semantics, every precondition holds
+      and the goal is reached. Alternative valid orderings also score 1.
+      Un-parseable JSON or a malformed plan scores 0.
+  natural_plan_trip:
+    solve_rate: >-
+      **Solve rate** — official NATURAL PLAN trip exact-match: the predicted
+      `(city, days)` sequence must match the gold itinerary for every gold stay,
+      in order (short predictions fail; extra trailing stays are ignored).
+      Un-parseable JSON scores 0.
+  natural_plan_meeting:
+    solve_rate: >-
+      **Solve rate** — official NATURAL PLAN meeting metric: a validator walks
+      the schedule (travel via the distance matrix, per-person availability
+      windows, no duplicates) and counts valid meetings; the example scores 1
+      iff that count equals the golden plan's optimum. Un-parseable JSON scores 0.
+  sentence_ordering_arxiv:
+    pmr: >-
+      **PMR (Perfect-Match Ratio)** — fraction of examples whose predicted order
+      exactly matches the single gold order (strict).
+    tau: >-
+      **Kendall's τ** — mean rank correlation between predicted and gold order in
+      $[-1,1]$ (1 identical, −1 reversed). A response that does not parse to a
+      valid permutation of $1..N$ contributes PMR 0, τ 0.
+  sentence_ordering_rocstories:
+    pmr: >-
+      **PMR (Perfect-Match Ratio)** — fraction of examples whose predicted order
+      exactly matches the single gold order (strict).
+    tau: >-
+      **Kendall's τ** — mean rank correlation between predicted and gold order in
+      $[-1,1]$ (1 identical, −1 reversed). A response that does not parse to a
+      valid permutation of $1..N$ contributes PMR 0, τ 0.
+  scierc_native_exact:
+    rel_entity_f1: >-
+      **Rel (entity-level) F1** — headline coref-aware relation F1: gold
+      mention-pair relations are projected to gold-cluster pairs, predicted
+      clusters are aligned to gold clusters by shared resolved spans, and
+      relations are matched at the cluster level. Micro-averaged; symmetric
+      relations match in either order.
+    rel_plus_entity_f1: >-
+      **Rel+ (entity-level) F1** — as Rel but the argument entity *types* must
+      also match (strict).
+    ner_f1: >-
+      **NER F1** — mention-level span+type micro-F1; this is the PURE /
+      PL-Marker / DyGIE++ “Ent” metric, 1:1. Predicted mention spans are
+      re-anchored to the raw token sequence by first-unused-occurrence
+      case-insensitive match; un-anchorable mentions are dropped.
+  amr_littleprince:
+    smatch_f1: >-
+      **Smatch F1** — the canonical AMR metric (Cai & Knight 2013): search for
+      the variable alignment between predicted and gold graphs that maximises
+      matched triples (instances, relations, attributes), then micro-averaged
+      F1 over the corpus. Computed with the official `smatch` package; a
+      response that fails to parse to a non-empty graph contributes 0 matched
+      triples (all gold triples become false negatives).
+  amr_bio:
+    smatch_f1: >-
+      **Smatch F1** — the canonical AMR metric (Cai & Knight 2013): search for
+      the variable alignment between predicted and gold graphs that maximises
+      matched triples (instances, relations, attributes), then micro-averaged
+      F1 over the corpus. Computed with the official `smatch` package; a
+      response that fails to parse to a non-empty graph contributes 0 matched
+      triples (all gold triples become false negatives).
+  wec_eng:
+    conll_f1: >-
+      **CoNLL F1** — the standard coreference headline: the unweighted mean of
+      the MUC, B³, and CEAFe F1 scores, computed over the marker partition of
+      each instance (micro-averaged across instances). A response that does not
+      parse (or carries no events) is scored as the all-singletons partition.
+    muc_f1: >-
+      **MUC F1** — link-based coreference F1 (Vilain et al. 1995): counts the
+      coreference links correctly recovered, insensitive to singletons.
+    b3_f1: >-
+      **B³ F1** — mention-based coreference F1 (Bagga & Baldwin 1998):
+      per-mention precision/recall over the gold vs predicted cluster a mention
+      lands in, averaged over mentions.
+    ceafe_f1: >-
+      **CEAFe F1** — entity-based coreference F1 (Luo 2005): best 1:1 alignment
+      between gold and predicted clusters under the φ4 (entity) similarity.
+    lea_f1: >-
+      **LEA F1** — link-based entity-aware coreference F1 (Moosavi & Strube
+      2016): each cluster is weighted by its size and scored by the fraction of
+      its coreference links it shares with the other side.

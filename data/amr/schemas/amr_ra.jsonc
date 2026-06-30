@@ -1,0 +1,40 @@
+{
+  "type": "object",
+  "properties": {
+    "root": {"type": "string", "ref": "node"},
+    "nodes": {
+      "type": "array",
+      "order": "align",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id":      {"type": "string", "idScope": "node"},
+          "concept": {"type": "string", "score": "exact"},
+          "attributes": {
+            "type": "array",
+            "order": "align",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role":  {"type": "string", "score": "exact"},
+                "value": {"type": "string", "score": "exact"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "relations": {
+      "type": "array",
+      "order": "align",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": {"type": "string", "ref": "node"},
+          "role":   {"type": "string", "score": "exact"},
+          "target": {"type": "string", "ref": "node"}
+        }
+      }
+    }
+  }
+}

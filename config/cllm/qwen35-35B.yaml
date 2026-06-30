@@ -1,0 +1,57 @@
+# Example single-model config for cllm.
+# Usage:
+#   cllm run <remote_port> <local_port> path/to/this.yaml
+# e.g.
+#   cllm run 18226 18225 examples/llama31_8B.yaml
+#
+# After the model is ready, OpenAI-API clients should point at
+#   http://127.0.0.1:<local_port>/v1
+
+name: qwen35-35b
+engine: vllm
+
+# Submit the successor job this many seconds before the current job's walltime ends.
+respawn_lead_seconds: 300
+
+# vLLM logs this once the HTTP endpoint is serving. Bump ready_timeout_seconds if
+# your model takes long to download / load weights.
+ready_marker: "Application startup complete."
+ready_timeout_seconds: 1800
+poll_interval_seconds: 20
+
+# Where on the cluster to drop sbatch scripts (one per submission).
+sbatch_remote_dir: "~/.cache/cllm/sbatch"
+
+ssh:
+  host: rci3                       # SSH alias from ~/.ssh/config
+  user: null                       # optional override
+  keepalive_interval: 30
+
+slurm:
+  partition: h200fast
+  time: "4:00:00"
+  gres: "gpu:1"
+  cpus_per_task: 4
+  ntasks_per_node: 1
+  nodes: 1
+  mem: "128G"
+  no_requeue: true
+  modules:
+    - "vLLM/0.17.1-foss-2025a-CUDA-12.8.0"
+    - "Triton/3.5.0-gfbf-2025a-CUDA-12.8.0"
+  venv: "~/devel/python/FC/HOST_MODEL/.venv_vllm17"
+  pre_cmds:
+    - 'export CUDA_VISIBLE_DEVICES=`/home/drchajan/bin/query_empty_gpus.py`'
+    - 'echo CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}'
+  log_dir: "~/devel/python/FC/HOST_MODEL/logs"
+  extra_sbatch: []
+
+vllm:
+  model: "Qwen/Qwen3.5-35B-A3B"
+  extra_args:
+    - "--max-model-len"
+    - "262144"
+    - "--reasoning-parser"
+    - "qwen3"
+    - "--default-chat-template-kwargs"
+    - '{"enable_thinking": false}'
